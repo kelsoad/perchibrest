@@ -1,0 +1,40 @@
+RewriteEngine On
+RewriteCond %{HTTPS} =off
+RewriteRule (.*) https://%{HTTP_HOST}%{REQUEST_URI} [QSA,L]
+
+# Сжатие текстовых файлов
+<IfModule mod_deflate.c>
+	AddOutputFilterByType DEFLATE text/html text/plain text/css text/javascript application/javascript application/json image/svg+xml
+</IfModule>
+
+# Кэш статики
+<IfModule mod_expires.c>
+	ExpiresActive On
+	ExpiresDefault "access plus 1 month"
+	ExpiresByType text/html "access plus 0 seconds"
+	ExpiresByType application/json "access plus 1 hour"
+	ExpiresByType text/css "access plus 1 year"
+	ExpiresByType application/javascript "access plus 1 year"
+	ExpiresByType image/jpeg "access plus 1 year"
+	ExpiresByType image/png "access plus 1 year"
+	ExpiresByType image/gif "access plus 1 year"
+	ExpiresByType image/webp "access plus 1 year"
+	ExpiresByType image/x-icon "access plus 1 year"
+	ExpiresByType application/pdf "access plus 1 month"
+</IfModule>
+
+<IfModule mod_headers.c>
+	Header always set X-Content-Type-Options "nosniff"
+	Header always set X-Frame-Options "SAMEORIGIN"
+	Header always set Referrer-Policy "strict-origin-when-cross-origin"
+	Header always set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+	<FilesMatch "\.(html|php)$">
+		Header set Cache-Control "no-cache, must-revalidate"
+	</FilesMatch>
+	<FilesMatch "\.(css|js|jpg|jpeg|png|gif|webp|ico|pdf|woff2)$">
+		Header set Cache-Control "public, max-age=31536000, immutable"
+	</FilesMatch>
+	<FilesMatch "catalog\.json$">
+		Header set Cache-Control "public, max-age=3600"
+	</FilesMatch>
+</IfModule>
